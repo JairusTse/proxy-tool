@@ -1,11 +1,13 @@
 from flask import Flask
 # from flask_restful import Resource, Api
-import redis
+# import redis
+from app import create_app
 
-app = Flask(__name__)
+app = create_app(__name__)
+# app = Flask(__name__)
 # api = Api(app)
 
-r = redis.Redis(host='localhost', db=2, encoding="utf-8", decode_responses=True)
+# r = redis.Redis(host='localhost', db=2, encoding="utf-8", decode_responses=True)
 
 @app.route('/')
 def index():
@@ -19,5 +21,5 @@ def index():
 
 # api.add_resource(Proxy, '/proxy.json')
 
-if __name__ == '__main__':
-    app.run()
+# if __name__ == '__main__':
+#     app.run()
