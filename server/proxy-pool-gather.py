@@ -9,7 +9,7 @@ import logging
 
 
 print("Start")
-r = redis.Redis(host='localhost', port=6380, db=2, encoding="utf-8", decode_responses=True)
+r = redis.Redis(host='localhost', port=6379, db=2, encoding="utf-8", decode_responses=True)
 print("Redis connected")
 
 
@@ -18,16 +18,11 @@ async def save(proxies):
         proxy = await proxies.get()
         if proxy is None:
             break
-        # if "HTTP" not in proxy.types:
-        #     continue
-        if "High" == proxy.types["HTTP"]:
-            row = '%s://%s:%d' % ("http", proxy.host, proxy.port)
-            print(row)
-            r.set(row, 0, ex=60 * 60 * 24)
-        elif "High" == proxy.types["HTTPS"]:
-            row = '%s://%s:%d' % ("https", proxy.host, proxy.port)
-            print(row)
-            r.set(row, 0, ex=60 * 60 * 24)
+        proto = 'https' if 'HTTPS' in proxy.types else 'http'
+        row = '%s://%s:%d' % (proto, proxy.host, proxy.port)
+        print("找到了：" + row)
+        r.set(row, 0)
+        print("保存了：" + r.get(row))
 
 async def show(proxies):
     while True:
