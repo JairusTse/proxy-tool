@@ -9,7 +9,7 @@ import logging
 
 
 print("Start")
-r = redis.Redis(host='localhost', port=6379, db=2, encoding="utf-8", decode_responses=True)
+r = redis.Redis(host='localhost', port=6379, db=0, encoding="utf-8", decode_responses=True)
 print("Redis connected")
 
 
@@ -21,8 +21,9 @@ async def save(proxies):
         proto = 'https' if 'HTTPS' in proxy.types else 'http'
         row = '%s://%s:%d' % (proto, proxy.host, proxy.port)
         print("找到了：" + row)
-        r.set(row, 0)
+        r.set(row, 1)
         print("保存了：" + r.get(row))
+
 
 async def show(proxies):
     while True:
@@ -31,16 +32,9 @@ async def show(proxies):
             break
         print('Found proxy: %s' % proxy)
 
+
 def main():
     print("Getting proxies")
-    # proxies = asyncio.Queue()
-    # broker = Broker(proxies, timeout=2, max_tries=2, grab_timeout=3600)
-    # tasks = asyncio.gather(broker.find(types=['HTTP', 'HTTPS']),
-    #                        save(proxies))
-    # loop = asyncio.get_event_loop()
-    # loop.run_until_complete(tasks)
-
-
 
     proxies = asyncio.Queue()
     broker = Broker(proxies)
@@ -50,13 +44,9 @@ def main():
 
     try:
         loop = asyncio.get_event_loop()
-        # loop.run_until_complete(asyncio.wait_for(tasks, 30))
         loop.run_until_complete(tasks)
     except asyncio.TimeoutError:
         print("RETRYING PROXIES ...")
-
-    # loop = asyncio.get_event_loop()
-    # loop.run_until_complete(tasks)
 
 
 if __name__ == '__main__':
