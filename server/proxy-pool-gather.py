@@ -2,7 +2,7 @@
 import asyncio
 
 import redis
-from lib.proxybroker import Broker
+from proxybroker import Broker
 import logging
 
 # logging.basicConfig(level=logging.DEBUG)
