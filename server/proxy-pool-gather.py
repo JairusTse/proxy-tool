@@ -9,22 +9,21 @@ import logging
 
 
 print("Start")
-r = redis.Redis(host='localhost', db=2, encoding="utf-8", decode_responses=True)
+r = redis.Redis(host='localhost', port=6380, db=2, encoding="utf-8", decode_responses=True)
 print("Redis connected")
-
 
 async def save(proxies):
     while True:
         proxy = await proxies.get()
         if proxy is None:
             break
-        print(proxy)
+        # print(proxy)
         if "HTTP" not in proxy.types:
             continue
         if "High" == proxy.types["HTTP"]:
             row = '%s://%s:%d' % ("http", proxy.host, proxy.port)
+            print(row)
             r.set(row, 0, ex=60 * 60 * 24)
-
 
 async def show(proxies):
     while True:
@@ -32,7 +31,6 @@ async def show(proxies):
         if proxy is None:
             break
         print('Found proxy: %s' % proxy)
-
 
 def main():
     print("Getting proxies")
@@ -43,10 +41,12 @@ def main():
     # loop = asyncio.get_event_loop()
     # loop.run_until_complete(tasks)
 
+
+
     proxies = asyncio.Queue()
     broker = Broker(proxies)
     tasks = asyncio.gather(
-        broker.find(types=['HTTP', 'HTTPS'], limit=10, verify_ssl=False), show(proxies)
+        broker.find(types=['HTTP', 'HTTPS'], limit=10000, verify_ssl=False), show(proxies)
     )
 
     try:
