@@ -18,11 +18,17 @@ async def save(proxies):
         proxy = await proxies.get()
         if proxy is None:
             break
-        proto = 'https' if 'HTTPS' in proxy.types else 'http'
-        row = '%s://%s:%d' % (proto, proxy.host, proxy.port)
-        print("找到了：" + row)
-        r.set(row, 1)
-        print("保存了：" + r.get(row))
+        # proto = 'https' if 'HTTPS' in proxy.types else 'http'
+        # row = '%s://%s:%d' % (proto, proxy.host, proxy.port)
+        # print("找到了：" + row)
+        # r.set(row, 1)
+        # print("保存了：" + r.get(row))
+        print(proxy)
+        if "HTTP" not in proxy.types:
+            continue
+        if "High" == proxy.types["HTTP"]:
+            row = '%s://%s:%d' % ("http", proxy.host, proxy.port)
+            r.set(row, 0, ex=60 * 60 * 24)
 
 
 async def show(proxies):
@@ -37,16 +43,11 @@ def main():
     print("Getting proxies")
 
     proxies = asyncio.Queue()
-    broker = Broker(proxies)
-    tasks = asyncio.gather(
-        broker.find(types=['HTTP', 'HTTPS'], limit=10000, verify_ssl=False), save(proxies)
-    )
-
-    try:
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(tasks)
-    except asyncio.TimeoutError:
-        print("RETRYING PROXIES ...")
+    broker = Broker(proxies, timeout=2, max_tries=2, grab_timeout=3600)
+    tasks = asyncio.gather(broker.find(types=['HTTP', 'HTTPS']),
+                           save(proxies))
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(tasks)
 
 
 if __name__ == '__main__':
