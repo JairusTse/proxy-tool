@@ -37,7 +37,7 @@ Scrapy==1.8.0
 service-identity==18.1.0
 six==1.12.0
 stevedore==1.32.0
-Twisted==19.10.0
+Twisted==22.2.0
 virtualenv==20.0.21
 virtualenv-clone==0.5.4
 virtualenvwrapper==4.8.4
